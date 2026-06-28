@@ -27,7 +27,7 @@ const Navbar = () => {
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4 ">
             <span className="hidden sm:block text-xs sm:text-sm text-gray-700">
-              {user?.fullName ?? user?.emailAddresses[0].emailAddress}
+              {user?.fullName ?? user?.emailAddresses[0]?.emailAddress}
             </span>
             <UserButton />
           </div>
