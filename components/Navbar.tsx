@@ -1,12 +1,31 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { ArrowRight, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Filter,
+  MoreHorizontal,
+  Share2,
+  Trello,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Badge } from "./ui/badge";
+interface Props {
+  boardTitle?: string;
+  onEditBoard?: () => void;
+  onFilterClick?: () => void;
+  filterCount?: number;
+}
 
-const Navbar = () => {
+const Navbar = ({
+  boardTitle,
+  onEditBoard,
+  onFilterClick,
+  filterCount = 0,
+}: Props) => {
   const { isSignedIn, user } = useUser();
   const pathname = usePathname();
 
@@ -31,6 +50,72 @@ const Navbar = () => {
             </span>
             <UserButton />
           </div>
+        </div>
+      </header>
+    );
+  }
+
+  if (isBoardPage) {
+    return (
+      <header className="bg-white border-b sticky top-0 z-50 flex items-center mx-auto px-3 sm:px-5">
+        <div className="container  mx-auto px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            {/* -------------Board Title/Color Edit------ */}
+            <section className="flex items-center space-x-2 sm:space-x-4 min-w-0">
+              <Link
+                href="/dashboard"
+                className="flex items-center space-x-1  text-gray-600 hover:text-gray-800 shrink-0 hover:cursor-pointer"
+              >
+                <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Back To Dashboard</span>
+                <span className="sm:hidden">Back</span>
+              </Link>
+              <div className="h-4 sm:h-6 w-px bg-gray-300 hidden sm:block" />
+              <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
+                <Trello className="text-green-600 " />
+                <div className="text-lg items-center space-x-1 sm:space-x-2 min-w-0">
+                  <span className="text-lg font-bold text-gray-900 truncate">
+                    {boardTitle}
+                  </span>
+                  {onEditBoard && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 shrink-0 p-0 cursor-pointer"
+                      onClick={onEditBoard}
+                    >
+                      <MoreHorizontal />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </section>
+            {/* -----------Filter Tasks ----------*/}
+            <section className="flex items-center space-x-2 sm:space-x-4 shrink-0">
+              {onFilterClick && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`text-xs sm:text-sm cursor-pointer ${filterCount > 0 ? "bg-green-100 border-green-200" : ""}`}
+                  onClick={onFilterClick}
+                >
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Filter</span>
+                  {filterCount > 0 && (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs ml-1 sm:ml-2 bg-green-100 border-green-200"
+                    >
+                      {filterCount}
+                    </Badge>
+                  )}
+                </Button>
+              )}
+            </section>
+          </div>
+        </div>
+        <div className="hidden sm:inline">
+          <UserButton />
         </div>
       </header>
     );
