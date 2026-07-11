@@ -96,15 +96,15 @@ const Navbar = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`text-xs sm:text-sm cursor-pointer ${filterCount > 0 ? "bg-green-100 border-green-200" : ""}`}
+                  className={` text-xs sm:text-sm cursor-pointer ${filterCount > 0 ? "bg-green-400 border-green-200 text-white hover:bg-green-500 hover:text-white" : ""}`}
                   onClick={onFilterClick}
                 >
-                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Filter</span>
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 " />
+                  <span className="hidden sm:inline ">Filter</span>
                   {filterCount > 0 && (
                     <Badge
                       variant="secondary"
-                      className="text-xs ml-1 sm:ml-2 bg-green-100 border-green-200"
+                      className="text-xs ml-1 sm:ml-2 bg-green-400 border-white text-white"
                     >
                       {filterCount}
                     </Badge>
