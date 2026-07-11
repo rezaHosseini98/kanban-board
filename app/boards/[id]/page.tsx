@@ -27,6 +27,8 @@ import { Calendar, Loader2, MoreHorizontal, Plus, User } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import {
+  closestCenter,
+  closestCorners,
   DndContext,
   DragEndEvent,
   DragOverEvent,
@@ -64,7 +66,7 @@ function DroppableColumn({
       className={`w-full lg:shrink-0 lg:w-80 ${isOver ? "bg-green-50 rounded-lg" : ""}`}
     >
       <div
-        className={`bg-white rounded-lg shadow-sm border ${isOver ? "ring-2 ring-green-300" : ""}`}
+        className={`bg-white rounded-lg shadow-sm border ${isOver ? "ring-2 ring-green-500 scale-102" : ""}`}
       >
         {/*--------- Column Header-------- */}
         <div className="p-3 sm:p-4 border-b ">
@@ -351,6 +353,12 @@ export default function BoardPage() {
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  const [filters, setFilters] = useState({
+    priority: [] as string[],
+    assignee: [] as string[],
+    dueDate: null as string | null,
+  });
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -358,6 +366,25 @@ export default function BoardPage() {
       },
     }),
   );
+  // ---Filtering functions--
+  function handleFilterChange(
+    type: "priority" | "assignee" | "dueDate",
+    value: string | string[] | null,
+  ) {
+    setFilters((prev) => ({
+      ...prev,
+      [type]: value,
+    }));
+  }
+
+  function clearFilter() {
+    setIsFilterOpen(false);
+    setFilters({
+      priority: [] as string[],
+      assignee: [] as string[],
+      dueDate: null as string | null,
+    });
+  }
 
   async function handleUpdateBoard(e: React.FormEvent) {
     e.preventDefault();
@@ -547,6 +574,27 @@ export default function BoardPage() {
     setEditingColumnTitle(column.title);
   }
 
+  const filteredColumns = columns.map((column) => ({
+    ...column,
+    tasks: column.tasks.filter((task) => {
+      // Filter by priority
+      if (
+        filters.priority.length > 0 &&
+        !filters.priority.includes(task.priority)
+      ) {
+        return false;
+      }
+      if (filters.dueDate && task.due_date) {
+        const taskDate = new Date(task.due_date).toDateString();
+        const filterDate = new Date(filters.dueDate).toDateString();
+        if (taskDate !== filterDate) {
+          return false;
+        }
+      }
+      return true;
+    }),
+  }));
+
   return (
     <>
       <div className="min-h-screen bg-gray-50">
@@ -558,7 +606,11 @@ export default function BoardPage() {
             setIsEditingTitle(true);
           }}
           onFilterClick={() => setIsFilterOpen(true)}
-          filterCount={2}
+          filterCount={Object.values(filters).reduce(
+            (count, v) =>
+              count + (Array.isArray(v) ? v.length : v !== null ? 1 : 0),
+            0,
+          )}
         />
 
         {/* ---------Edit Title/TitleColor----------- */}
@@ -650,7 +702,23 @@ export default function BoardPage() {
                 <Label>Priority</Label>
                 <div className="flex flex-wrap gap-2">
                   {["low", "medium", "high"].map((priority, key) => (
-                    <Button key={key} variant={"outline"} size="sm">
+                    <Button
+                      onClick={() => {
+                        const newPriorities = filters.priority.includes(
+                          priority,
+                        )
+                          ? filters.priority.filter((p) => p !== priority)
+                          : [...filters.priority, priority];
+                        handleFilterChange("priority", newPriorities);
+                      }}
+                      key={key}
+                      variant={
+                        filters.priority.includes(priority)
+                          ? "default"
+                          : "outline"
+                      }
+                      size="sm"
+                    >
                       {priority.charAt(0).toUpperCase() + priority.slice(1)}
                     </Button>
                   ))}
@@ -668,7 +736,13 @@ export default function BoardPage() {
             </div> */}
               <div className="space-y-2">
                 <Label>due Date</Label>
-                <Input type="date" />
+                <Input
+                  type="date"
+                  value={filters.dueDate || ""}
+                  onChange={(e) =>
+                    handleFilterChange("dueDate", e.target.value || null)
+                  }
+                />
               </div>
 
               <div className="flex justify-end pt-4 gap-2">
@@ -676,16 +750,16 @@ export default function BoardPage() {
                   type="button"
                   className="cursor-pointer hover:bg-gray-300"
                   variant={"outline"}
-                  onClick={() => setIsFilterOpen(false)}
+                  onClick={clearFilter}
                 >
-                  Clear{" "}
+                  Clear Filter
                 </Button>
                 <Button
                   type="button"
                   className="cursor-pointer"
                   onClick={() => setIsFilterOpen(false)}
                 >
-                  Apply{" "}
+                  Apply Filter
                 </Button>
               </div>
             </div>
@@ -791,7 +865,7 @@ export default function BoardPage() {
           {/* -----------Board Columns-------- */}
           <DndContext
             sensors={sensors}
-            collisionDetection={rectIntersection}
+            collisionDetection={closestCenter}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
@@ -803,7 +877,7 @@ export default function BoardPage() {
             lg:[&::-webkit-scrollbar-thumb]:bg-gray-300 lg:[&::-webkit-scrollbar-thumb]:rounded-full 
             space-y-4 lg:space-y-0"
             >
-              {columns.map((column, key) => (
+              {filteredColumns.map((column, key) => (
                 <DroppableColumn
                   key={key}
                   column={column}
