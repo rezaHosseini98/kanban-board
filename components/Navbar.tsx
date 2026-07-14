@@ -147,7 +147,7 @@ const Navbar = ({
               </Link>
             </div>
           ) : (
-            <div>
+            <div className="space-x-2">
               <SignInButton>
                 <Button
                   variant="ghost"
@@ -158,7 +158,10 @@ const Navbar = ({
                 </Button>
               </SignInButton>
               <SignUpButton>
-                <Button className="bg-green-600 cursor-pointer hover:bg-green-500">
+                <Button
+                  size="sm"
+                  className="bg-green-600 cursor-pointer hover:bg-green-500"
+                >
                   Sign Up
                 </Button>
               </SignUpButton>

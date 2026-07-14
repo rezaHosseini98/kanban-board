@@ -1,4 +1,5 @@
 "use client";
+import BoardError from "@/components/dashboard/BoardError";
 import Navbar from "@/components/Navbar";
 import DashboardSkelton from "@/components/skeleton/DashboardSkelton";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,14 @@ export default function DashboardPage() {
       max: null as number | null,
     },
   });
+  const [tempFilters, setTempFilters] = useState({ ...filters });
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsFilterOpen(open);
+    if (open) {
+      setTempFilters({ ...filters });
+    }
+  };
 
   const filteredBoards = boards.filter((board: Board) => {
     const matchesSearch = board.title
@@ -69,17 +78,19 @@ export default function DashboardPage() {
     return matchesSearch && matchDateRange;
   });
   function clearFilters() {
-    setFilters({
+    const emptyFilters = {
       search: "",
-      dateRange: {
-        start: null as string | null,
-        end: null as string | null,
-      },
-      taskCount: {
-        min: null as number | null,
-        max: null as number | null,
-      },
-    });
+      dateRange: { start: null, end: null },
+      taskCount: { min: null, max: null },
+    };
+    setFilters(emptyFilters);
+    setTempFilters(emptyFilters);
+    setIsFilterOpen(false);
+  }
+
+  function applyFilters() {
+    setFilters(tempFilters);
+    setIsFilterOpen(false);
   }
   const handleCreateBoard = async () => {
     await createBoard({ title: "New Board" });
@@ -89,12 +100,7 @@ export default function DashboardPage() {
     return <DashboardSkelton />;
   }
   if (error) {
-    return (
-      <div>
-        <h2>Error loading boards </h2>
-        <p>{error}</p>
-      </div>
-    );
+    return <BoardError error={error} />;
   }
   return (
     <div className="min-h-screen bg-gray-50">
@@ -236,14 +242,14 @@ export default function DashboardPage() {
           </div>
           {/* --------------Search Bar----- */}
           <div className="relative mb-4 sm:mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 " />
             <Input
               id="search"
               placeholder="Search boards..."
               className="pl-10"
-              // onChange={(e) =>
-              //   setFilters((prev) => ({ ...prev, search: e.target.value }))
-              // }
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, search: e.target.value }))
+              }
             />
           </div>
           {/* ---------Boards Grid/List-------------- */}
@@ -341,7 +347,7 @@ export default function DashboardPage() {
         </div>
       </main>
       {/* Filter Dialog */}
-      <Dialog open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+      <Dialog open={isFilterOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="w-[95vw] max-w-106.25 mx-auto">
@@ -355,11 +361,14 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <Label>Search</Label>
               <Input
-                id="search"
-                value={filters.search}
+                id="dialog-search"
+                value={tempFilters.search}
                 placeholder="Search board titles..."
                 onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, search: e.target.value }))
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    search: e.target.value,
+                  }))
                 }
               />
             </div>
@@ -370,8 +379,10 @@ export default function DashboardPage() {
                   <Label className="text-xs">Start Date</Label>
                   <Input
                     type="date"
+                    id="start-date"
+                    value={tempFilters.dateRange.start || ""}
                     onChange={(e) =>
-                      setFilters((prev) => ({
+                      setTempFilters((prev) => ({
                         ...prev,
                         dateRange: {
                           ...prev.dateRange,
@@ -384,9 +395,11 @@ export default function DashboardPage() {
                 <div>
                   <Label className="text-xs">End Date</Label>
                   <Input
+                    id="end-date"
                     type="date"
+                    value={tempFilters.dateRange.end || ""}
                     onChange={(e) =>
-                      setFilters((prev) => ({
+                      setTempFilters((prev) => ({
                         ...prev,
                         dateRange: {
                           ...prev.dateRange,
@@ -441,9 +454,7 @@ export default function DashboardPage() {
               <Button variant={"outline"} onClick={clearFilters}>
                 Clear Filter
               </Button>
-              <Button onClick={() => setIsFilterOpen(false)}>
-                Apply Filter
-              </Button>
+              <Button onClick={applyFilters}>Apply Filter</Button>
             </div>
           </div>
         </DialogContent>
