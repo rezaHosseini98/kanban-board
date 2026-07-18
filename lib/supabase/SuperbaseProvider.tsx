@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { useSession } from "@clerk/nextjs";
 import DashboardSkelton from "@/components/skeleton/DashboardSkelton";
+import LandingPageSkelton from "@/components/skeleton/LandingPageSkelton";
 
 type SupabaseContext = {
   supabase: SupabaseClient | null;
@@ -42,7 +43,7 @@ export default function SupabaseProvider({
 
   return (
     <Context.Provider value={{ supabase, isLoaded }}>
-      {!isLoaded ? <DashboardSkelton /> : children}
+      {!isLoaded ? <LandingPageSkelton /> : children}
     </Context.Provider>
   );
 }
