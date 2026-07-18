@@ -356,7 +356,12 @@ export default function BoardPage() {
 
   const [filters, setFilters] = useState({
     priority: [] as string[],
-    assignee: [] as string[],
+    assignee: "" as string,
+    dueDate: null as string | null,
+  });
+  const [tempFilters, setTempFilters] = useState({
+    priority: [] as string[],
+    assignee: "" as string,
     dueDate: null as string | null,
   });
   const sensors = useSensors(
@@ -367,23 +372,32 @@ export default function BoardPage() {
     }),
   );
   // ---Filtering functions--
-  function handleFilterChange(
+  function handleOpenFilter() {
+    setTempFilters({ ...filters });
+    setIsFilterOpen(true);
+  }
+  function handleTempFilterChange(
     type: "priority" | "assignee" | "dueDate",
     value: string | string[] | null,
   ) {
-    setFilters((prev) => ({
+    setTempFilters((prev) => ({
       ...prev,
       [type]: value,
     }));
   }
-
-  function clearFilter() {
+  function applyFilters() {
+    setFilters({ ...tempFilters });
     setIsFilterOpen(false);
-    setFilters({
+  }
+  function clearFilter() {
+    const emptyFilters = {
       priority: [] as string[],
-      assignee: [] as string[],
+      assignee: "" as string,
       dueDate: null as string | null,
-    });
+    };
+    setFilters(emptyFilters);
+    setTempFilters(emptyFilters);
+    setIsFilterOpen(false);
   }
 
   async function handleUpdateBoard(e: React.FormEvent) {
@@ -577,20 +591,34 @@ export default function BoardPage() {
   const filteredColumns = columns.map((column) => ({
     ...column,
     tasks: column.tasks.filter((task) => {
-      // Filter by priority
       if (
         filters.priority.length > 0 &&
         !filters.priority.includes(task.priority)
       ) {
         return false;
       }
+
+      if (filters.assignee.trim() !== "") {
+        if (!task.assignee) return false;
+        if (
+          !task.assignee
+            .toLowerCase()
+            .includes(filters.assignee.toLowerCase().trim())
+        ) {
+          return false;
+        }
+      }
+
       if (filters.dueDate && task.due_date) {
         const taskDate = new Date(task.due_date).toDateString();
         const filterDate = new Date(filters.dueDate).toDateString();
         if (taskDate !== filterDate) {
           return false;
         }
+      } else if (filters.dueDate && !task.due_date) {
+        return false;
       }
+
       return true;
     }),
   }));
@@ -606,11 +634,23 @@ export default function BoardPage() {
             setIsEditingTitle(true);
           }}
           onFilterClick={() => setIsFilterOpen(true)}
-          filterCount={Object.values(filters).reduce(
-            (count, v) =>
-              count + (Array.isArray(v) ? v.length : v !== null ? 1 : 0),
-            0,
-          )}
+          filterCount={Object.values(filters).reduce((count, v) => {
+            if (Array.isArray(v)) {
+              return count + v.length;
+            }
+            if (typeof v === "string" && v.trim() !== "") {
+              return count + 1;
+            }
+            if (
+              v !== null &&
+              v !== undefined &&
+              typeof v !== "string" &&
+              !Array.isArray(v)
+            ) {
+              return count + 1;
+            }
+            return count;
+          }, 0)}
         />
 
         {/* ---------Edit Title/TitleColor----------- */}
@@ -704,16 +744,16 @@ export default function BoardPage() {
                   {["low", "medium", "high"].map((priority, key) => (
                     <Button
                       onClick={() => {
-                        const newPriorities = filters.priority.includes(
+                        const newPriorities = tempFilters.priority.includes(
                           priority,
                         )
-                          ? filters.priority.filter((p) => p !== priority)
-                          : [...filters.priority, priority];
-                        handleFilterChange("priority", newPriorities);
+                          ? tempFilters.priority.filter((p) => p !== priority)
+                          : [...tempFilters.priority, priority];
+                        handleTempFilterChange("priority", newPriorities);
                       }}
                       key={key}
                       variant={
-                        filters.priority.includes(priority)
+                        tempFilters.priority.includes(priority)
                           ? "default"
                           : "outline"
                       }
@@ -724,23 +764,24 @@ export default function BoardPage() {
                   ))}
                 </div>
               </div>
-              {/* <div className="space-y-2">
-              <Label>Assignee</Label>
-              <div className="flex flex-wrap gap-2">
-                {["low", "medium", "high"].map((priority, key) => (
-                  <Button key={key} variant={"outline"} size="sm">
-                    {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                  </Button>
-                ))}
+              <div className="space-y-2">
+                <Label htmlFor="filterAssignee">Assignee</Label>
+                <Input
+                  id="filterAssignee"
+                  placeholder="Filter by assignee name..."
+                  value={tempFilters.assignee}
+                  onChange={(e) =>
+                    handleTempFilterChange("assignee", e.target.value)
+                  }
+                />
               </div>
-            </div> */}
               <div className="space-y-2">
                 <Label>due Date</Label>
                 <Input
                   type="date"
-                  value={filters.dueDate || ""}
+                  value={tempFilters.dueDate || ""}
                   onChange={(e) =>
-                    handleFilterChange("dueDate", e.target.value || null)
+                    handleTempFilterChange("dueDate", e.target.value || null)
                   }
                 />
               </div>
@@ -757,7 +798,7 @@ export default function BoardPage() {
                 <Button
                   type="button"
                   className="cursor-pointer"
-                  onClick={() => setIsFilterOpen(false)}
+                  onClick={applyFilters}
                 >
                   Apply Filter
                 </Button>
