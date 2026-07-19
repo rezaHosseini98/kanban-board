@@ -352,6 +352,7 @@ export default function BoardPage() {
   const [isEditingColumn, setIsEditingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [isOpenCreatingTask, setIsOpenCreatingTask] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const [filters, setFilters] = useState({
@@ -446,10 +447,8 @@ export default function BoardPage() {
       try {
         await createTask(taskData);
         // closing task card from dom
-        const trigger = document.querySelector(
-          '[data-state="open"]',
-        ) as HTMLElement;
-        if (trigger) trigger.click();
+        setIsOpenCreatingTask(false);
+        (e.target as HTMLFormElement).reset();
       } catch (error) {
         console.error(error);
       } finally {
@@ -819,7 +818,10 @@ export default function BoardPage() {
             </div>
 
             {/* ------ Add task dialog------*/}
-            <Dialog>
+            <Dialog
+              open={isOpenCreatingTask}
+              onOpenChange={setIsOpenCreatingTask}
+            >
               <DialogTrigger asChild>
                 <Button className="w-full sm:w-auto cursor-pointer ">
                   <Plus />
@@ -881,15 +883,24 @@ export default function BoardPage() {
                     <Label>due Date</Label>
                     <Input type="date" id="dueDate" name="dueDate" />
                   </div>
-                  <div className="flex justify-end space-x-2 pt-4">
+                  <div className="flex justify-between space-x-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsOpenCreatingTask(false)}
+                      className="text-green-500 hover:text-green-600  cursor-pointer border border-green-500  hover:border-green-600"
+                      disabled={isCreatingTask}
+                    >
+                      Cancel
+                    </Button>
                     <Button
                       variant={"ghost"}
                       type="submit"
-                      className="text-gray-500 hover:text-green-600  cursor-pointer border border-gray-500  hover:border-green-600"
+                      className="text-green-500 hover:text-green-600  cursor-pointer border border-green-500  hover:border-green-600 "
                       disabled={isCreatingTask}
                     >
                       {isCreatingTask ? (
-                        <div className="flex items-center justify-center gap-2 text-white">
+                        <div className="flex items-center justify-center gap-2 text-green-500">
                           <Loader2 className="h-4 w-4 animate-spin" />
                           <span>Creating...</span>
                         </div>
