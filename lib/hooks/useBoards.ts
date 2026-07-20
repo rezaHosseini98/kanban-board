@@ -231,6 +231,61 @@ export function useBoard(boardId: string) {
       );
     }
   }
+  // ----------update tasks------
+  async function updateRealTask(
+    taskId: string,
+    taskData: {
+      title: string;
+      description?: string;
+      assignee?: string;
+      dueDate?: string;
+      priority: "low" | "medium" | "high";
+    },
+  ) {
+    try {
+      const updatedTask = await taskService.updateTask(supabase!, taskId, {
+        title: taskData.title,
+        description: taskData.description || null,
+        assignee: taskData.assignee || null,
+        due_date: taskData.dueDate || null,
+        priority: taskData.priority,
+      });
+
+      // update task on UI
+      setColumns((prev) =>
+        prev.map((col) => ({
+          ...col,
+          tasks: col.tasks.map((task) =>
+            task.id === taskId ? { ...task, ...updatedTask } : task,
+          ),
+        })),
+      );
+      return updatedTask;
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Failed to update the task.",
+      );
+    }
+  }
+
+  // -------------  delete task------------
+  async function deleteRealTask(taskId: string) {
+    try {
+      await taskService.deleteTask(supabase!, taskId);
+
+      // delete task on ui
+      setColumns((prev) =>
+        prev.map((col) => ({
+          ...col,
+          tasks: col.tasks.filter((task) => task.id !== taskId),
+        })),
+      );
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Failed to delete the task.",
+      );
+    }
+  }
   return {
     board,
     columns,
@@ -242,5 +297,7 @@ export function useBoard(boardId: string) {
     moveTask,
     createColumn,
     updateColumn,
+    updateRealTask,
+    deleteRealTask,
   };
 }

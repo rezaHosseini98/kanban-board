@@ -23,7 +23,15 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useBoard } from "@/lib/hooks/useBoards";
 import { ColumnWithTasks, Task } from "@/lib/supabase/models";
-import { Calendar, Loader2, MoreHorizontal, Plus, User } from "lucide-react";
+import {
+  Calendar,
+  Edit,
+  Loader2,
+  MoreHorizontal,
+  Plus,
+  Trash2,
+  User,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import {
@@ -47,6 +55,12 @@ import {
 } from "@dnd-kit/sortable";
 
 import { CSS } from "@dnd-kit/utilities";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 function DroppableColumn({
   column,
   children,
@@ -184,7 +198,15 @@ function DroppableColumn({
   );
 }
 
-function SortableTask({ task }: { task: Task }) {
+function SortableTask({
+  task,
+  onEditTask,
+  onDeleteTask,
+}: {
+  task: Task;
+  onEditTask: (task: Task) => void;
+  onDeleteTask: (taskId: string) => void;
+}) {
   const {
     attributes,
     listeners,
@@ -222,6 +244,40 @@ function SortableTask({ task }: { task: Task }) {
               <h4 className="font-medium text-gray-900 text-sm leading-tight flex-1 min-w-0 pr-2">
                 {task.title}
               </h4>
+              {/* Actions: Edit & Delete buttons */}
+              <div
+                className="shrink-0"
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-gray-500 hover:text-gray-700 cursor-pointer"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-28 md:w-32">
+                    <DropdownMenuItem
+                      onClick={() => onEditTask(task)}
+                      className="cursor-pointer text-gray-700 focus:text-green-600 focus:bg-green-50 flex items-center justify-start"
+                    >
+                      <Edit className="h-3.5 w-3.5 md:mr-2  focus:text-green-600" />
+                      <span>Edit</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onDeleteTask(task.id)}
+                      className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 flex items-center justify-start"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 md:mr-2  text-red-600 focus:text-red-700" />
+                      <span>Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             {/* Task Description */}
             <p className="text-xs text-gray-600 line-clamp-2">
@@ -336,7 +392,14 @@ export default function BoardPage() {
     setColumns,
     moveTask,
     updateColumn,
+    updateRealTask,
+    deleteRealTask,
   } = useBoard(id);
+
+  // States for Editing Task
+  const [isEditingTask, setIsEditingTask] = useState(false);
+  const [editingTaskData, setEditingTaskData] = useState<Task | null>(null);
+  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -454,6 +517,45 @@ export default function BoardPage() {
       } finally {
         setIsCreatingTask(false);
       }
+    }
+  }
+  // --- Task Edit & Delete Handlers ---
+  function handleEditTaskClick(task: Task) {
+    setEditingTaskData(task);
+    setIsEditingTask(true);
+  }
+
+  async function handleDeleteTaskClick(taskId: string) {
+    if (!confirm("Are you sure you want to delete this task?")) return;
+    try {
+      await deleteRealTask(taskId);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function handleUpdateTaskSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!editingTaskData) return;
+
+    const formData = new FormData(e.currentTarget);
+    const taskData = {
+      title: formData.get("title") as string,
+      description: (formData.get("description") as string) || undefined,
+      assignee: (formData.get("assignee") as string) || undefined,
+      dueDate: (formData.get("dueDate") as string) || undefined,
+      priority: formData.get("priority") as "low" | "medium" | "high",
+    };
+
+    setIsUpdatingTask(true);
+    try {
+      await updateRealTask(editingTaskData.id, taskData);
+      setIsEditingTask(false);
+      setEditingTaskData(null);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUpdatingTask(false);
     }
   }
   // -------------handle Drags --------
@@ -942,7 +1044,12 @@ export default function BoardPage() {
                   >
                     <div className="space-y-3">
                       {column.tasks.map((task, key) => (
-                        <SortableTask task={task} key={key} />
+                        <SortableTask
+                          task={task}
+                          key={key}
+                          onEditTask={handleEditTaskClick}
+                          onDeleteTask={handleDeleteTaskClick}
+                        />
                       ))}
                     </div>
                   </SortableContext>
@@ -965,6 +1072,100 @@ export default function BoardPage() {
           </DndContext>
         </main>
       </div>
+      {/* ------------------- DIALOG: EDIT TASK ------------------- */}
+      <Dialog open={isEditingTask} onOpenChange={setIsEditingTask}>
+        <DialogContent className="w-[95vw] max-w-106.25 mx-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+            <DialogDescription className="text-xs text-gray-600">
+              Update task details
+            </DialogDescription>
+          </DialogHeader>
+          {editingTaskData && (
+            <form className="space-y-4" onSubmit={handleUpdateTaskSubmit}>
+              <div className="space-y-2">
+                <Label>
+                  Title <sup className="text-red-500">*</sup>
+                </Label>
+                <Input
+                  id="title"
+                  name="title"
+                  defaultValue={editingTaskData.title}
+                  placeholder="Enter task title"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  defaultValue={editingTaskData.description || ""}
+                  placeholder="Enter task description"
+                  rows={3}
+                />
+              </div>
+              <div className="space-y-4">
+                <Label>Assignee</Label>
+                <Input
+                  id="assignee"
+                  name="assignee"
+                  defaultValue={editingTaskData.assignee || ""}
+                  placeholder="Who should do this?"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Priority</Label>
+                <Select name="priority" defaultValue={editingTaskData.priority}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["low", "medium", "high"].map((priority, key) => (
+                      <SelectItem key={key} value={priority}>
+                        {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Due Date</Label>
+                <Input
+                  type="date"
+                  id="dueDate"
+                  name="dueDate"
+                  defaultValue={editingTaskData.due_date || ""}
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isUpdatingTask}
+                  onClick={() => {
+                    setIsEditingTask(false);
+                    setEditingTaskData(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isUpdatingTask}>
+                  {isUpdatingTask ? (
+                    <div className="flex items-center justify-center gap-2 text-white">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Saving...</span>
+                    </div>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Add new  column */}
       <Dialog open={CreatingColumn} onOpenChange={setCreatingColumn}>
         <DialogContent className="w-[95vw] max-w-106.25 mx-auto">
