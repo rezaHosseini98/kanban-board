@@ -157,6 +157,30 @@ export const taskService = {
 
     return data;
   },
+  // ------------- updateTask ------------
+  async updateTask(
+    supabase: SupabaseClient,
+    taskId: string,
+    updates: Partial<Omit<Task, "id" | "created_at" | "updated_at">>,
+  ): Promise<Task> {
+    const { data, error } = await supabase
+      .from("tasks")
+      .update(updates)
+      .eq("id", taskId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+  },
+
+  // ------------- Delete task------------
+  async deleteTask(supabase: SupabaseClient, taskId: string): Promise<void> {
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
+
+    if (error) throw error;
+  },
 };
 
 export const boardDataService = {
