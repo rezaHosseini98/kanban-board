@@ -19,11 +19,25 @@ export const boardService = {
       .from("boards")
       .select("*")
       .eq("user_id", userId)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
     return data || [];
+  },
+  async getDeletedBoardsCount(
+    supabase: SupabaseClient,
+    userId: string,
+  ): Promise<number> {
+    const { count, error } = await supabase
+      .from("boards")
+      .select("*", { count: "exact", head: true }) // head: true فقط تعداد را برمی‌گرداند
+      .eq("user_id", userId)
+      .not("deleted_at", "is", null);
+
+    if (error) throw error;
+    return count || 0;
   },
   async createBoard(
     supabase: SupabaseClient,
@@ -54,6 +68,14 @@ export const boardService = {
     if (error) throw error;
 
     return data;
+  },
+  async deleteBoard(supabase: SupabaseClient, boardId: string): Promise<void> {
+    const { error } = await supabase
+      .from("boards")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", boardId);
+
+    if (error) throw error;
   },
 };
 
