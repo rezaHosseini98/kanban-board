@@ -17,10 +17,12 @@ import { useState } from "react";
 // https://definite-ladybird-90.clerk.accounts.dev
 export default function DashboardPage() {
   const { user } = useUser();
-  const { createBoard, boards, loading, error } = useBoards();
+  const { createBoard, deleteBoard, boards, deletedCount, loading, error } =
+    useBoards();
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
+
   const [isCreating, setIsCreating] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
@@ -29,7 +31,6 @@ export default function DashboardPage() {
       end: null as string | null,
     },
   });
-  const [tempFilters, setTempFilters] = useState({ ...filters });
 
   const filteredBoards = boards.filter((board: Board) => {
     const matchesSearch = board.title
@@ -64,6 +65,13 @@ export default function DashboardPage() {
       setIsCreating(false);
     }
   };
+  const handleDeleteBoard = async (boardId: string) => {
+    try {
+      await deleteBoard(boardId);
+    } catch (err) {
+      console.error("Error deleting board:", err);
+    }
+  };
 
   if (loading) {
     return <DashboardSkelton />;
@@ -80,7 +88,7 @@ export default function DashboardPage() {
         <DashboardHeader user={user} />
 
         {/*-------------- Stats Cards------------ */}
-        <StatCards boards={boards} />
+        <StatCards boards={boards} deletedCount={deletedCount} />
 
         {/* ----------Boards---------- */}
         <div className="mb-6 sm:mb-8">
@@ -109,6 +117,7 @@ export default function DashboardPage() {
             boards={filteredBoards}
             viewMode={viewMode}
             onCreateBoard={handleCreateBoard}
+            onDeleteBoard={handleDeleteBoard}
             isCreating={isCreating}
           />
         </div>

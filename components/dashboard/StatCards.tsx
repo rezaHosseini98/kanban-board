@@ -1,12 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Board } from "@/lib/supabase/models";
-import { ChartNoAxesColumn, Rocket, Trello } from "lucide-react";
+import { ChartNoAxesColumn, Rocket, Trash2, Trello } from "lucide-react";
 
 interface StatCardsProps {
   boards: Board[];
+  deletedCount: number;
 }
 
-export default function StatCards({ boards }: StatCardsProps) {
+export default function StatCards({ boards, deletedCount }: StatCardsProps) {
+  const totalBoards = boards.length + deletedCount;
   const recentActivityCount = boards.filter((board) => {
     const updatedAt = new Date(board.updated_at);
     const oneWeekAgo = new Date();
@@ -25,7 +27,7 @@ export default function StatCards({ boards }: StatCardsProps) {
                 Total Boards
               </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                {boards.length}
+                {totalBoards}
               </p>
             </div>
             <div className="h-10 w-10 sm:h-12 sm:w-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -73,20 +75,20 @@ export default function StatCards({ boards }: StatCardsProps) {
         </CardContent>
       </Card>
 
-      {/* Shared/Duplicate Info */}
+      {/* Deleted Projects */}
       <Card>
         <CardContent className="p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs sm:text-sm font-medium text-gray-600">
-                Total Boards
+                Deleted Projects
               </p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">
-                {boards.length}
+                {deletedCount}
               </p>
             </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Trello className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-red-100 rounded-lg flex items-center justify-center">
+              <Trash2 className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
             </div>
           </div>
         </CardContent>

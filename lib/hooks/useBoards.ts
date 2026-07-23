@@ -19,6 +19,7 @@ export function useBoards() {
   const { user } = useUser();
   const { supabase } = useSupabase();
   const [boards, setBoards] = useState<Board[]>([]);
+  const [deletedCount, setDeletedCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,8 +33,13 @@ export function useBoards() {
     try {
       setLoading(true);
       setError(null);
-      const data = await boardService.getBoards(supabase!, user.id);
-      setBoards(data);
+      const [activeBoards, count] = await Promise.all([
+        boardService.getBoards(supabase!, user.id),
+        boardService.getDeletedBoardsCount(supabase!, user.id),
+      ]);
+
+      setBoards(activeBoards);
+      setDeletedCount(count);
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to load board.",
@@ -60,8 +66,22 @@ export function useBoards() {
       );
     }
   }
+  async function deleteBoard(boardId: string) {
+    if (!user) throw new Error("User not authenticated.");
+    try {
+      await boardService.deleteBoard(supabase!, boardId);
 
-  return { boards, loading, error, createBoard };
+      setBoards((prev) => prev.filter((board) => board.id !== boardId));
+      setDeletedCount((prev) => prev + 1);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to delete board.";
+      setError(message);
+      throw error;
+    }
+  }
+
+  return { boards, deletedCount, loading, error, createBoard, deleteBoard };
 }
 
 // ----------A function for one board to get data
