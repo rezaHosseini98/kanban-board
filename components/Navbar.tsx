@@ -15,13 +15,28 @@ import { usePathname } from "next/navigation";
 import { Badge } from "./ui/badge";
 interface Props {
   boardTitle?: string;
+  boardColor?: string;
   onEditBoard?: () => void;
   onFilterClick?: () => void;
   filterCount?: number;
 }
-
+const colorTextMap: Record<string, string> = {
+  "bg-blue-500": "text-blue-500",
+  "bg-green-500": "text-green-500",
+  "bg-yellow-500": "text-yellow-500",
+  "bg-red-500": "text-red-500",
+  "bg-purple-500": "text-purple-500",
+  "bg-pink-500": "text-pink-500",
+  "bg-indigo-500": "text-indigo-500",
+  "bg-gray-500": "text-gray-500",
+  "bg-orange-500": "text-orange-500",
+  "bg-teal-500": "text-teal-500",
+  "bg-cyan-500": "text-cyan-500",
+  "bg-emerald-500": "text-emerald-500",
+};
 const Navbar = ({
   boardTitle,
+  boardColor,
   onEditBoard,
   onFilterClick,
   filterCount = 0,
@@ -34,6 +49,10 @@ const Navbar = ({
   const isDashboardPage = pathname === "/dashboard";
   const isBoardPage = pathname.startsWith("/boards/");
 
+  const iconColorClass =
+    boardColor && colorTextMap[boardColor]
+      ? colorTextMap[boardColor]
+      : "text-green-600";
   if (isDashboardPage) {
     return (
       <header className="border-b bg-white-80 backdrop-blur-sm sticky top-0 z-50">
@@ -72,7 +91,7 @@ const Navbar = ({
               </Link>
               <div className="h-4 sm:h-6 w-px bg-gray-300 hidden sm:block" />
               <div className="flex items-center space-x-1 sm:space-x-2 min-w-0">
-                <Trello className="text-green-600 " />
+                <Trello className={`h-5 w-5 ${iconColorClass}`} />
                 <div className="text-lg items-center space-x-1 sm:space-x-2 min-w-0">
                   <span className="text-lg font-bold text-gray-900 truncate">
                     {boardTitle}
