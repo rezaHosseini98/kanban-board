@@ -417,6 +417,7 @@ export default function BoardPage() {
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isOpenCreatingTask, setIsOpenCreatingTask] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [newDescription, setNewDescription] = useState("");
 
   const [filters, setFilters] = useState({
     priority: [] as string[],
@@ -472,6 +473,7 @@ export default function BoardPage() {
     try {
       await updateBoard(board.id, {
         title: newTitle.trim(),
+        description: newDescription.trim(),
         color: newColor || board.color,
       });
       setIsEditingTitle(false);
@@ -729,8 +731,10 @@ export default function BoardPage() {
       <div className="min-h-screen bg-gray-50">
         <Navbar
           boardTitle={board?.title}
+          boardColor={board?.color}
           onEditBoard={() => {
             setNewTitle(board?.title ?? "");
+            setNewDescription(board?.description ?? "");
             setNewColor(board?.color ?? "");
             setIsEditingTitle(true);
           }}
@@ -772,6 +776,16 @@ export default function BoardPage() {
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Enter board title..."
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="boardDescription">Board Description</Label>
+                <Textarea
+                  id="boardDescription"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  placeholder="Enter board description..."
+                  rows={3}
                 />
               </div>
 
@@ -918,6 +932,7 @@ export default function BoardPage() {
                 {columns.reduce((sum, col) => sum + col.tasks.length, 0)}
               </div>
             </div>
+            <p>{board?.description}</p>
 
             {/* ------ Add task dialog------*/}
             <Dialog

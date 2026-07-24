@@ -2,6 +2,7 @@
 import BoardError from "@/components/dashboard/BoardError";
 import BoardList from "@/components/dashboard/BoardList";
 import BoardToolbar from "@/components/dashboard/BoardToolbar";
+import CreateBoardDialog from "@/components/dashboard/CreateBoardDialog";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import FilterDialog from "@/components/dashboard/FilterDialog";
 import StatCards from "@/components/dashboard/StatCards";
@@ -24,6 +25,7 @@ export default function DashboardPage() {
   const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
 
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
     dateRange: {
@@ -55,10 +57,14 @@ export default function DashboardPage() {
     setFilters(empty);
     setIsFilterOpen(false);
   };
-  const handleCreateBoard = async () => {
+  const handleCreateBoard = async (data: {
+    title: string;
+    color: string;
+    description?: string;
+  }) => {
     setIsCreating(true);
     try {
-      await createBoard({ title: "New Board" });
+      await createBoard(data);
     } catch (err) {
       console.error("Failed to create board:", err);
     } finally {
@@ -97,7 +103,7 @@ export default function DashboardPage() {
             viewMode={viewMode}
             setViewMode={setViewMode}
             onFilterClick={() => setIsFilterOpen(true)}
-            onCreateBoard={handleCreateBoard}
+            onCreateBoard={() => setIsCreateOpen(true)}
             isCreating={isCreating}
           />
           {/* --------------Search Bar----- */}
@@ -116,7 +122,7 @@ export default function DashboardPage() {
           <BoardList
             boards={filteredBoards}
             viewMode={viewMode}
-            onCreateBoard={handleCreateBoard}
+            onCreateBoard={() => setIsCreateOpen(true)}
             onDeleteBoard={handleDeleteBoard}
             isCreating={isCreating}
           />
@@ -129,6 +135,13 @@ export default function DashboardPage() {
         currentFilters={filters}
         onApply={handleApplyFilters}
         onClear={handleClearFilters}
+      />
+
+      <CreateBoardDialog
+        isOpen={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onCreate={handleCreateBoard}
+        isCreating={isCreating}
       />
     </div>
   );

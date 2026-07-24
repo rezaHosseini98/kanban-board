@@ -49,6 +49,11 @@ export default function BoardList({
 
     return now - boardDate < twentyFourHoursInMs;
   };
+  // Truncate description to 20 characters for grid view
+  const formatGridDescription = (desc?: string | null) => {
+    if (!desc) return "";
+    return desc.length > 20 ? `${desc.slice(0, 20)}...` : desc;
+  };
   const handleDeleteClick = (e: React.MouseEvent, boardId: string) => {
     e.preventDefault();
     e.stopPropagation();
@@ -151,8 +156,8 @@ export default function BoardList({
                     <CardTitle className="text-base sm:text-lg mb-2 group-hover:text-green-600 transition-colors">
                       {board.title}
                     </CardTitle>
-                    <CardDescription className="text-sm mb-4 line-clamp-2">
-                      {board.description}
+                    <CardDescription className="text-sm mb-4 ">
+                      {formatGridDescription(board.description)}
                     </CardDescription>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs text-gray-500 space-y-1 sm:space-y-0 pt-2 border-t border-gray-100">
@@ -212,7 +217,7 @@ export default function BoardList({
                       <CardTitle className="text-base group-hover:text-green-600 transition-colors">
                         {board.title}
                       </CardTitle>
-                      <p className="text-sm text-gray-500 line-clamp-1">
+                      <p className="text-sm text-gray-500 wrap-break-word">
                         {board.description}
                       </p>
                     </div>
