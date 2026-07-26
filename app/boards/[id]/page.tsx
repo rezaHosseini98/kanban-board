@@ -61,6 +61,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 function DroppableColumn({
   column,
   children,
@@ -69,11 +79,28 @@ function DroppableColumn({
 }: {
   column: ColumnWithTasks;
   children: React.ReactNode;
-  onCreateTask: (taskData: any) => Promise<void>;
+  onCreateTask: (
+    e: React.FormEvent<HTMLFormElement>,
+    columnId: string,
+  ) => Promise<void>;
   onEditColumn: (column: ColumnWithTasks) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
+  const [isOpen, setIsOpen] = useState(false);
   const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsCreatingTask(true);
+    try {
+      await onCreateTask(e, column.id);
+      setIsOpen(false);
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsCreatingTask(false);
+    }
+  };
   return (
     <div
       ref={setNodeRef}
@@ -108,7 +135,7 @@ function DroppableColumn({
           {children}
           {/* Add Task */}
 
-          <Dialog>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button
                 className="w-full  cursor-pointer mt-3 text-gray-500 hover:text-green-600 border border-gray-500 border-dashed hover:border-green-600"
@@ -125,7 +152,7 @@ function DroppableColumn({
                   Add a task to the board
                 </DialogDescription>
               </DialogHeader>
-              <form className="space-y-4" onSubmit={onCreateTask}>
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                   <Label>
                     Title <sup className="text-red-500">*</sup>
@@ -172,15 +199,24 @@ function DroppableColumn({
                   <Label>due Date</Label>
                   <Input type="date" id="dueDate" name="dueDate" />
                 </div>
-                <div className="flex justify-end space-x-2 pt-4">
+                <div className="flex justify-between space-x-2 pt-4">
                   <Button
-                    type="submit"
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsOpen(false)}
+                    className="text-green-500 hover:text-green-600 cursor-pointer border border-green-500 hover:border-green-600"
+                    disabled={isCreatingTask}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
                     variant={"ghost"}
-                    className="text-gray-500 hover:text-green-600  cursor-pointer border border-gray-500  hover:border-green-600"
+                    type="submit"
+                    className="text-green-500 hover:text-green-600 cursor-pointer border border-green-500 hover:border-green-600"
                     disabled={isCreatingTask}
                   >
                     {isCreatingTask ? (
-                      <div className="flex items-center justify-center gap-2 text-white">
+                      <div className="flex items-center justify-center gap-2 text-green-500">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         <span>Creating...</span>
                       </div>
@@ -401,6 +437,8 @@ export default function BoardPage() {
   const [editingTaskData, setEditingTaskData] = useState<Task | null>(null);
   const [isUpdatingTask, setIsUpdatingTask] = useState(false);
 
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newColor, setNewColor] = useState("");
@@ -483,20 +521,23 @@ export default function BoardPage() {
     }
   }
 
-  async function createTask(taskData: {
-    title: string;
-    description?: string;
-    assignee?: string;
-    dueDate?: string;
-    priority: "low" | "medium" | "high";
-  }) {
-    const targetColumn = columns[0];
-    if (!targetColumn) {
-      throw new Error("No column available to add task");
-    }
-    await createRealTask(targetColumn.id, taskData);
+  async function createTask(
+    columnId: string,
+    taskData: {
+      title: string;
+      description?: string;
+      assignee?: string;
+      dueDate?: string;
+      priority: "low" | "medium" | "high";
+    },
+  ) {
+    await createRealTask(columnId, taskData);
   }
-  async function handleCreateTasks(e: any) {
+
+  async function handleCreateTasks(
+    e: React.FormEvent<HTMLFormElement>,
+    targetColumnId?: string,
+  ) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const taskData = {
@@ -507,11 +548,17 @@ export default function BoardPage() {
       priority:
         (formData.get("priority") as "low" | "medium" | "high") || "medium",
     };
+
+    const columnId = targetColumnId || columns[0]?.id;
+
+    if (!columnId) {
+      throw new Error("No column available to add task");
+    }
+
     if (taskData.title.trim()) {
       setIsCreatingTask(true);
       try {
-        await createTask(taskData);
-        // closing task card from dom
+        await createTask(columnId, taskData);
         setIsOpenCreatingTask(false);
         (e.target as HTMLFormElement).reset();
       } catch (error) {
@@ -527,12 +574,18 @@ export default function BoardPage() {
     setIsEditingTask(true);
   }
 
-  async function handleDeleteTaskClick(taskId: string) {
-    if (!confirm("Are you sure you want to delete this task?")) return;
+  function handleDeleteTaskClick(taskId: string) {
+    setTaskToDelete(taskId);
+  }
+
+  async function confirmDeleteTask() {
+    if (!taskToDelete) return;
     try {
-      await deleteRealTask(taskId);
+      await deleteRealTask(taskToDelete);
     } catch (error) {
       console.error(error);
+    } finally {
+      setTaskToDelete(null);
     }
   }
 
@@ -1087,6 +1140,34 @@ export default function BoardPage() {
           </DndContext>
         </main>
       </div>
+      {/* ------------------- ALERT DIALOG: DELETE TASK ------------------- */}
+      <AlertDialog
+        open={!!taskToDelete}
+        onOpenChange={(open) => !open && setTaskToDelete(null)}
+      >
+        <AlertDialogContent className="w-[95vw] max-w-106.25 mx-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this task?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              task.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex items-center justify-end space-x-2 pt-2">
+            <AlertDialogCancel onClick={() => setTaskToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteTask}
+              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {/* ------------------- DIALOG: EDIT TASK ------------------- */}
       <Dialog open={isEditingTask} onOpenChange={setIsEditingTask}>
         <DialogContent className="w-[95vw] max-w-106.25 mx-auto">
