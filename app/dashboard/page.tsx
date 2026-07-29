@@ -13,7 +13,7 @@ import { useBoards } from "@/lib/hooks/useBoards";
 import { Board } from "@/lib/supabase/models";
 import { useUser } from "@clerk/nextjs";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 // https://definite-ladybird-90.clerk.accounts.dev
 export default function DashboardPage() {
@@ -34,19 +34,21 @@ export default function DashboardPage() {
     },
   });
 
-  const filteredBoards = boards.filter((board: Board) => {
-    const matchesSearch = board.title
-      .toLowerCase()
-      .includes(filters.search.toLowerCase());
+  const filteredBoards = useMemo(() => {
+    return boards.filter((board: Board) => {
+      const matchesSearch = board.title
+        .toLowerCase()
+        .includes(filters.search.toLowerCase());
 
-    const matchDateRange =
-      !filters.dateRange.start ||
-      (new Date(board.created_at) >= new Date(filters.dateRange.start) &&
-        (!filters.dateRange.end ||
-          new Date(board.created_at) <= new Date(filters.dateRange.end)));
+      const matchDateRange =
+        !filters.dateRange.start ||
+        (new Date(board.created_at) >= new Date(filters.dateRange.start) &&
+          (!filters.dateRange.end ||
+            new Date(board.created_at) <= new Date(filters.dateRange.end)));
 
-    return matchesSearch && matchDateRange;
-  });
+      return matchesSearch && matchDateRange;
+    });
+  }, [boards, filters]);
   const handleApplyFilters = (newFilters: typeof filters) => {
     setFilters(newFilters);
     setIsFilterOpen(false);
