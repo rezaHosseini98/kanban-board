@@ -51,10 +51,17 @@ export default function SortableTask({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    touchAction: "none",
   };
 
   return (
-    <div ref={setNodeRef} style={styles} {...listeners} {...attributes}>
+    <div
+      ref={setNodeRef}
+      style={styles}
+      {...listeners}
+      {...attributes}
+      className="touch-none select-none"
+    >
       <Card className="cursor-pointer hover:shadow-md transition-shadow hover:bg-green-100">
         <CardContent className="p-3 sm:p-4">
           <div className="space-y-2 sm:space-y-3">
@@ -66,6 +73,7 @@ export default function SortableTask({
                 className="shrink-0"
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
               >
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
