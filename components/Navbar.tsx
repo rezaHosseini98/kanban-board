@@ -65,7 +65,7 @@ const Navbar = ({
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4 ">
             <span className="hidden sm:block text-xs sm:text-sm text-gray-700">
-              {user?.fullName ?? user?.emailAddresses[0]?.emailAddress}
+              {user?.fullName ?? user?.emailAddresses?.[0]?.emailAddress ?? ""}
             </span>
             <UserButton />
           </div>
@@ -153,7 +153,10 @@ const Navbar = ({
           {isSignedIn ? (
             <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-1 sm:space-y-0 sm:space-x-4">
               <span className="hidden sm:block text-xs sm:text-sm text-gray-700">
-                Welcome,{user.firstName ?? user.emailAddresses[0].emailAddress}
+                Welcome,
+                {user.firstName ??
+                  user.emailAddresses?.[0]?.emailAddress ??
+                  "User"}
               </span>
               <Link href="/dashboard">
                 <Button size="sm" className="btn-primary text-xs sm:text-sm">
