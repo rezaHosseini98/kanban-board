@@ -97,7 +97,7 @@ export default function DroppableColumn({
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button
-                className="w-full cursor-pointer mt-3 text-gray-500 hover:text-green-600 border border-gray-500 border-dashed hover:border-green-600"
+                className="w-full cursor-pointer mt-3 text-gray-500 hover:text-green-600 border border-gray-500  hover:border-green-600 hover:scale-102 active:scale-95"
                 variant={"ghost"}
               >
                 <Plus />
@@ -158,30 +158,30 @@ export default function DroppableColumn({
                   <Label>due Date</Label>
                   <Input type="date" id="dueDate" name="dueDate" />
                 </div>
-                <div className="flex justify-between space-x-2 pt-4">
+                <div className="flex-actions">
                   <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsOpen(false)}
-                    className="text-green-500 hover:text-green-600 cursor-pointer border border-green-500 hover:border-green-600"
-                    disabled={isCreatingTask}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant={"ghost"}
+                    variant="default"
                     type="submit"
-                    className="text-green-500 hover:text-green-600 cursor-pointer border border-green-500 hover:border-green-600"
+                    className="btn-primary"
                     disabled={isCreatingTask}
                   >
                     {isCreatingTask ? (
-                      <div className="flex items-center justify-center gap-2 text-green-500">
+                      <div className="flex items-center justify-center gap-2 ">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         <span>Creating...</span>
                       </div>
                     ) : (
                       "Create Task"
                     )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsOpen(false)}
+                    className="btn-secondary"
+                    disabled={isCreatingTask}
+                  >
+                    Cancel
                   </Button>
                 </div>
               </form>

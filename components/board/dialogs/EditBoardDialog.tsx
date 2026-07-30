@@ -100,20 +100,8 @@ export default function EditBoardDialog({
               ))}
             </div>
           </div>
-          <div className="flex justify-end space-x-2">
-            <Button
-              className="cursor-pointer hover:bg-gray-300"
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="cursor-pointer"
-              disabled={isUpdating}
-            >
+          <div className="flex-actions">
+            <Button type="submit" className="btn-primary" disabled={isUpdating}>
               {isUpdating ? (
                 <div className="flex items-center justify-center gap-2 text-white">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -122,6 +110,14 @@ export default function EditBoardDialog({
               ) : (
                 "Save Changes"
               )}
+            </Button>
+            <Button
+              className="btn-secondary"
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
             </Button>
           </div>
         </form>

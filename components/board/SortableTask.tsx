@@ -80,16 +80,16 @@ export default function SortableTask({
                   <DropdownMenuContent align="end" className="w-28 md:w-32">
                     <DropdownMenuItem
                       onClick={() => onEditTask(task)}
-                      className="cursor-pointer text-gray-700 focus:text-green-600 focus:bg-green-50 flex items-center justify-start"
+                      className="cursor-pointer text-gray-700 focus:text-gray-800  flex items-center justify-start focus:scale-105"
                     >
-                      <Edit className="h-3.5 w-3.5 md:mr-2 focus:text-green-600" />
+                      <Edit className="h-3.5 w-3.5 md:mr-2 text-gray-700 focus:text-gray-800" />
                       <span>Edit</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onDeleteTask(task.id)}
-                      className="cursor-pointer text-red-600 focus:text-red-700 focus:bg-red-50 flex items-center justify-start"
+                      className="cursor-pointer text-red-500  focus:text-red-600 flex items-center justify-start focus:scale-105"
                     >
-                      <Trash2 className="h-3.5 w-3.5 md:mr-2 text-red-600 focus:text-red-700" />
+                      <Trash2 className="h-3.5 w-3.5 md:mr-2 text-red-500 focus:text-red-600" />
                       <span>Delete</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -122,7 +122,7 @@ export default function SortableTask({
                 <div
                   className={`w-2 h-2 rounded-full shrink-0 ${getPriorityColor(task.priority)}`}
                 />
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-green-800 text-white text-[10px] font-medium px-2 py-0.5 rounded shadow-sm whitespace-nowrap pointer-events-none z-10">
+                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block bg-green-500 text-white text-[10px] font-medium px-2 py-0.5 rounded shadow-sm whitespace-nowrap pointer-events-none z-10">
                   {task.priority}
                 </span>
               </div>

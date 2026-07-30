@@ -50,6 +50,7 @@ export default function FilterDialog({
             <div className="flex flex-wrap gap-2">
               {["low", "medium", "high"].map((priority, key) => (
                 <Button
+                  className="cursor-pointer"
                   onClick={() => {
                     const newPriorities = tempFilters.priority.includes(
                       priority,
@@ -91,17 +92,17 @@ export default function FilterDialog({
             />
           </div>
 
-          <div className="flex justify-end pt-4 gap-2">
+          <div className="flex-actions">
+            <Button type="button" className="btn-primary" onClick={onApply}>
+              Apply Filter
+            </Button>
             <Button
               type="button"
-              className="cursor-pointer hover:bg-gray-300"
+              className="btn-secondary"
               variant={"outline"}
               onClick={onClear}
             >
               Clear Filter
-            </Button>
-            <Button type="button" className="cursor-pointer" onClick={onApply}>
-              Apply Filter
             </Button>
           </div>
         </div>

@@ -59,11 +59,8 @@ export default function ColumnDialog({
               placeholder="Enter column title..."
             />
           </div>
-          <div className="space-x-2 flex justify-end">
-            <Button type="button" onClick={onCancel} variant={"outline"}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
+          <div className="flex-actions">
+            <Button type="submit" className="btn-primary" disabled={isLoading}>
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2 text-white">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -74,6 +71,14 @@ export default function ColumnDialog({
               ) : (
                 "Create Column"
               )}
+            </Button>
+            <Button
+              type="button"
+              className="btn-secondary"
+              onClick={onCancel}
+              variant={"outline"}
+            >
+              Cancel
             </Button>
           </div>
         </form>

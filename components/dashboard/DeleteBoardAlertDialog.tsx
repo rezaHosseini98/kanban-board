@@ -11,38 +11,36 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface DeleteTaskAlertDialogProps {
+interface DeleteBoardAlertDialogProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCancel: () => void;
-  onConfirm: () => Promise<void>;
+  onClose: () => void;
+  onConfirm: () => void;
 }
 
-export default function DeleteTaskAlertDialog({
+export default function DeleteBoardAlertDialog({
   isOpen,
-  onOpenChange,
-  onCancel,
+  onClose,
   onConfirm,
-}: DeleteTaskAlertDialogProps) {
+}: DeleteBoardAlertDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="w-[95vw] max-w-106.25 mx-auto">
+    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want to delete this task?
+            Are you sure you want to delete this board?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            task.
+            This action cannot be undone. Deleting this board will permanently
+            remove all associated data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-actions">
-          <AlertDialogCancel onClick={onCancel} className="btn-secondary">
+          <AlertDialogCancel onClick={onClose} className="btn-secondary">
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="btn-secondary bg-red-600 hover:bg-red-700 text-white btn-secondary"
+            className="bg-red-600 hover:bg-red-700 text-white btn-secondary"
           >
             Delete
           </AlertDialogAction>

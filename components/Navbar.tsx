@@ -83,7 +83,7 @@ const Navbar = ({
             <section className="flex items-center space-x-2 sm:space-x-4 min-w-0">
               <Link
                 href="/dashboard"
-                className="flex items-center space-x-1  text-gray-600 hover:text-gray-800 shrink-0 hover:cursor-pointer"
+                className="flex items-center space-x-1  text-gray-600 hover:text-gray-800 shrink-0 btn-secondary "
               >
                 <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="hidden sm:inline">Back To Dashboard</span>
@@ -115,7 +115,7 @@ const Navbar = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className={` text-xs sm:text-sm cursor-pointer ${filterCount > 0 ? "bg-green-400 border-green-200 text-white hover:bg-green-500 hover:text-white" : ""}`}
+                  className={` text-xs sm:text-sm btn-secondary  ${filterCount > 0 ? "bg-green-500 border-green-200 text-white hover:bg-green-500 hover:text-white" : ""}`}
                   onClick={onFilterClick}
                 >
                   <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 " />
@@ -123,7 +123,7 @@ const Navbar = ({
                   {filterCount > 0 && (
                     <Badge
                       variant="secondary"
-                      className="text-xs ml-1 sm:ml-2 bg-green-400 border-white text-white"
+                      className="text-xs ml-1 sm:ml-2 bg-green-500 border-white text-white"
                     >
                       {filterCount}
                     </Badge>
@@ -156,12 +156,9 @@ const Navbar = ({
                 Welcome,{user.firstName ?? user.emailAddresses[0].emailAddress}
               </span>
               <Link href="/dashboard">
-                <Button
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-500 cursor-pointer text-xs sm:text-sm"
-                >
+                <Button size="sm" className="btn-primary text-xs sm:text-sm">
                   Go to Dashboard
-                  <ArrowRight />
+                  <ArrowRight className="h-4 w-4 " />
                 </Button>
               </Link>
             </div>
@@ -171,16 +168,13 @@ const Navbar = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs sm:text-sm cursor-pointer "
+                  className="btn-secondary  text-xs sm:text-sm"
                 >
                   Sign In
                 </Button>
               </SignInButton>
               <SignUpButton>
-                <Button
-                  size="sm"
-                  className="bg-green-600 cursor-pointer hover:bg-green-500"
-                >
+                <Button size="sm" className="btn-primary">
                   Sign Up
                 </Button>
               </SignUpButton>

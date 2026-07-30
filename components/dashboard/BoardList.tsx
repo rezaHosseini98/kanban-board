@@ -23,6 +23,7 @@ import { Board } from "@/lib/supabase/models";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import DeleteBoardAlertDialog from "./DeleteBoardAlertDialog";
 
 interface BoardListProps {
   boards: Board[];
@@ -70,35 +71,14 @@ export default function BoardList({
   return (
     <>
       {/* ----------------- Delete Confirmation Dialog ----------------- */}
-      <AlertDialog
-        open={!!boardToDelete}
-        onOpenChange={(open) => !open && setBoardToDelete(null)}
-      >
-        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want to delete this board?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. Deleting this board will permanently
-              remove all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-end gap-2">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
+      <DeleteBoardAlertDialog
+        isOpen={!!boardToDelete}
+        onClose={() => setBoardToDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
       {/* ----------------- Empty State (No Boards) ----------------- */}
       {boards.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg border border-dashed flex flex-col items-center justify-center p-6">
+        <div className="text-center py-12 bg-white rounded-lg border  flex flex-col items-center justify-center p-6">
           <p className="text-gray-500 mb-4">
             No boards found matching your criteria.
           </p>
@@ -106,7 +86,7 @@ export default function BoardList({
           <Button
             onClick={onCreateBoard}
             disabled={isCreating}
-            className="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out text-white px-4 py-2 rounded-md text-sm font-medium"
           >
             {isCreating ? (
               <>
@@ -126,7 +106,7 @@ export default function BoardList({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {boards.map((board) => (
             <Link href={`/boards/${board.id}`} key={board.id}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 group h-full flex flex-col justify-between">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer hover:scale-105 group h-full flex flex-col justify-between hover:border-green-500">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div
@@ -144,10 +124,10 @@ export default function BoardList({
                       variant="ghost"
                       size="icon"
                       onClick={(e) => handleDeleteClick(e, board.id)}
-                      className="h-7 w-7 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                      className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                       title="Delete board"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4 " />
                     </Button>
                   </div>
                 </CardHeader>
@@ -181,7 +161,7 @@ export default function BoardList({
             variant="ghost"
             className="w-full h-full p-0 bg-transparent hover:bg-transparent text-left block group"
           >
-            <Card className="border-2 border-dashed h-full min-h-40 group-hover:border-green-400 group-hover:scale-105 transition-all cursor-pointer">
+            <Card className="  h-full min-h-40 group-hover:border-green-500 group-hover:scale-105 transition-all cursor-pointer hover:shadow-lg ">
               <CardContent className="p-4 sm:p-6 flex flex-col items-center justify-center h-full">
                 {isCreating ? (
                   <>
@@ -207,7 +187,7 @@ export default function BoardList({
         <div className="space-y-4">
           {boards.map((board) => (
             <Link href={`/boards/${board.id}`} key={board.id} className="block">
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer group hover:border-green-500">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div
@@ -231,7 +211,7 @@ export default function BoardList({
                       variant="ghost"
                       size="icon"
                       onClick={(e) => handleDeleteClick(e, board.id)}
-                      className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                       title="Delete board"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -247,7 +227,7 @@ export default function BoardList({
             disabled={isCreating}
             className="w-full text-left p-0 bg-transparent hover:bg-transparent disabled:pointer-events-none block"
           >
-            <Card className="border-2 border-dashed hover:border-green-400 transition-colors cursor-pointer group">
+            <Card className="border hover:border-green-500 transition-colors cursor-pointer group">
               <CardContent className="p-4 flex items-center justify-center space-x-2">
                 {isCreating ? (
                   <>

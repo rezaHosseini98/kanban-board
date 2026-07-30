@@ -103,7 +103,7 @@ export default function TaskDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>{isEdit ? "Due Date" : "due Date"}</Label>
+            <Label>{"Due Date"}</Label>
             <Input
               type="date"
               id="dueDate"
@@ -112,40 +112,15 @@ export default function TaskDialog({
             />
           </div>
 
-          <div
-            className={`flex space-x-2 pt-4 ${
-              isEdit ? "justify-end" : "justify-between"
-            }`}
-          >
+          <div className="flex-actions">
             <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              className={
-                !isEdit
-                  ? "text-green-500 hover:text-green-600 cursor-pointer border border-green-500 hover:border-green-600"
-                  : ""
-              }
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant={!isEdit ? "ghost" : "default"}
+              variant={"default"}
               type="submit"
-              className={
-                !isEdit
-                  ? "text-green-500 hover:text-green-600 cursor-pointer border border-green-500 hover:border-green-600"
-                  : ""
-              }
+              className="btn-primary"
               disabled={isLoading}
             >
               {isLoading ? (
-                <div
-                  className={`flex items-center justify-center gap-2 ${
-                    !isEdit ? "text-green-500" : "text-white"
-                  }`}
-                >
+                <div className={`flex items-center justify-center gap-2 `}>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>{isEdit ? "Saving..." : "Creating..."}</span>
                 </div>
@@ -154,6 +129,15 @@ export default function TaskDialog({
               ) : (
                 "Create Task"
               )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="btn-secondary"
+              disabled={isLoading}
+            >
+              Cancel
             </Button>
           </div>
         </form>
