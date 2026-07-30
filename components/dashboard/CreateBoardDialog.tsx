@@ -80,7 +80,9 @@ export default function CreateBoardDialog({
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Label htmlFor="createBoardTitle">Board Title</Label>
+            <Label htmlFor="createBoardTitle">
+              Board Titles <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="createBoardTitle"
               value={title}
@@ -117,15 +119,8 @@ export default function CreateBoardDialog({
             </div>
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isCreating || !title.trim()}>
+          <div className="flex-actions">
+            <Button type="submit" className="btn-primary" disabled={isCreating}>
               {isCreating ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -134,6 +129,15 @@ export default function CreateBoardDialog({
               ) : (
                 "Create Board"
               )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="btn-secondary"
+              disabled={isCreating}
+              onClick={() => handleOpenChange(false)}
+            >
+              Cancel
             </Button>
           </div>
         </form>

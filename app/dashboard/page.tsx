@@ -49,6 +49,15 @@ export default function DashboardPage() {
       return matchesSearch && matchDateRange;
     });
   }, [boards, filters]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.search.trim() !== "") count++;
+    if (filters.dateRange.start) count++;
+    if (filters.dateRange.end) count++;
+    return count;
+  }, [filters]);
+
   const handleApplyFilters = (newFilters: typeof filters) => {
     setFilters(newFilters);
     setIsFilterOpen(false);
@@ -107,6 +116,7 @@ export default function DashboardPage() {
             onFilterClick={() => setIsFilterOpen(true)}
             onCreateBoard={() => setIsCreateOpen(true)}
             isCreating={isCreating}
+            activeFilterCount={activeFilterCount}
           />
           {/* --------------Search Bar----- */}
           <div className="relative mb-4 sm:mb-6">
@@ -114,7 +124,7 @@ export default function DashboardPage() {
             <Input
               id="search"
               placeholder="Search boards..."
-              className="pl-10"
+              className="pl-10 "
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
               }

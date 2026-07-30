@@ -7,6 +7,7 @@ interface BoardToolbarProps {
   onFilterClick: () => void;
   onCreateBoard: () => void;
   isCreating: boolean;
+  activeFilterCount?: number;
 }
 
 export default function BoardToolbar({
@@ -15,7 +16,9 @@ export default function BoardToolbar({
   onFilterClick,
   onCreateBoard,
   isCreating,
+  activeFilterCount = 0,
 }: BoardToolbarProps) {
+  const filterCount = activeFilterCount > 0;
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-4 sm:space-y-0">
       <div>
@@ -29,6 +32,7 @@ export default function BoardToolbar({
           <Button
             variant={viewMode === "grid" ? "default" : "ghost"}
             size="sm"
+            className="btn-secondary"
             onClick={() => setViewMode("grid")}
           >
             <Grid3X3 className="h-4 w-4" />
@@ -36,18 +40,24 @@ export default function BoardToolbar({
           <Button
             variant={viewMode === "list" ? "default" : "ghost"}
             size="sm"
+            className="btn-secondary"
             onClick={() => setViewMode("list")}
           >
             <List className="h-4 w-4" />
           </Button>
         </div>
-        <Button variant="outline" size="sm" onClick={onFilterClick}>
+        <Button
+          variant={filterCount ? "default" : "outline"}
+          size="sm"
+          className="cursor-pointer hover:scale-105 active:scale-95"
+          onClick={onFilterClick}
+        >
           <Filter className="mr-2 h-4 w-4" /> Filter
         </Button>
         <Button
           onClick={onCreateBoard}
           disabled={isCreating}
-          className="min-w-32.5"
+          className="min-w-32.5 bg-green-500 hover:bg-green-600 transition-all duration-200 ease-in-out cursor-pointer hover:scale-105 active:scale-95"
         >
           {isCreating ? (
             <>

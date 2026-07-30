@@ -115,11 +115,17 @@ export default function FilterDialog({
             </div>
           </div>
 
-          <div className="flex justify-end pt-4 space-x-2">
-            <Button variant="outline" onClick={onClear}>
+          <div className="flex-actions">
+            <Button className="btn-primary" onClick={handleApply}>
+              Apply Filter
+            </Button>
+            <Button
+              className="btn-secondary"
+              variant="outline"
+              onClick={onClear}
+            >
               Clear Filter
             </Button>
-            <Button onClick={handleApply}>Apply Filter</Button>
           </div>
         </div>
       </DialogContent>

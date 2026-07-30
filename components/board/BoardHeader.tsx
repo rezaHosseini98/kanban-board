@@ -21,11 +21,13 @@ export default function BoardHeader({
           {totalTasks}
         </div>
       </div>
-      <p className="text-gray-700">
-        <span className="font-bold">description: </span>"{description}"
-      </p>
+      {description !== "" && (
+        <p className="text-gray-700">
+          <span className="font-bold">description: </span>"{description}"
+        </p>
+      )}
 
-      <Button className="w-full sm:w-auto cursor-pointer" onClick={onAddTask}>
+      <Button className="w-full sm:w-auto btn-primary" onClick={onAddTask}>
         <Plus className="mr-1 h-4 w-4" />
         Add Task
       </Button>

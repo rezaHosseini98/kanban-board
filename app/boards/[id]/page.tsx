@@ -308,7 +308,7 @@ export default function BoardPage() {
               <div className="w-full lg:shrink-0 lg:w-80">
                 <Button
                   variant="outline"
-                  className="w-full h-full min-h-50 border-dashed border-2 text-gray-500 hover:border-green-500 cursor-pointer hover:text-green-500"
+                  className="w-full h-full min-h-50  border-2 text-gray-500 hover:border-green-500 cursor-pointer hover:text-green-500"
                   onClick={() => dialogs.setCreatingColumn(true)}
                 >
                   <Plus className="mr-1 h-4 w-4" /> Add another list
