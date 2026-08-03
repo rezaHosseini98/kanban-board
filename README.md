@@ -1,40 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+   <h3 align="center">RH KanBan </h3>
+   <br />
 
-## Getting Started
+   <a href="https://rh-kanban.vercel.app" target="_blank">
+      <img src="public/banner.webp" alt="Project Banner" width="80%">
+   </a>
 
-First, run the development server:
+<br /><br />
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   <div>
+      <img src="https://img.shields.io/badge/Next.js-000000?style=plastic&logo=next.js&logoColor=white"/>
+      <img src="https://img.shields.io/badge/TypeScript-3178C6?style=plastic&logo=typescript&logoColor=white"/>
+     <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=plastic&logo=supabase&logoColor=white" alt="Supabase" />
+     <img src="https://img.shields.io/badge/Clerk-6C47FF?style=plastic&logo=clerk&logoColor=white" alt="Clerk" />
+     <img src="https://img.shields.io/badge/dnd--kit-FAB005?style=plastic&logo=react&logoColor=white" alt="dnd-kit" />
+     <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=plastic&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+   </div>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   <br />
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   <a href="https://rh-kanban.vercel.app" target="_blank">
+      <img src="https://img.shields.io/badge/Live_Demo-ff4500?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"/>
+   </a>
+</div>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📋 <a name="table">Table of Contents</a>
 
-## Learn More
+1. ✨ [Introduction](#introduction)  
+2. 🛠 [Tech Stack](#tech-stack)  
+3. 🚀 [Features](#features)  
+4. 📸 [Screenshots](#screenshots)
+5. 🤸 [Quick Start](#quick-start)
 
-To learn more about Next.js, take a look at the following resources:
+---
+## <a name="introduction">✨ Introduction</a>
+RHreddit is a modern Reddit-inspired social platform where users can create posts, engage in discussions through comments, vote on content, and discover trending conversations. Built with Next.js, Prisma, Neon, and Tailwind CSS, it delivers a fast, scalable, and responsive user experience.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## <a name="tech-stack">🛠 Tech Stack</a>
+| Technology | Role |
+| :--- | :--- |
+| **[Next.js](https://nextjs.org/)** | React Framework with File-Based Routing & Server Components |
+| **[Supabase](https://supabase.com/)** | Hosted Postgres, Real-Time Subscriptions & Storage |
+| **[Clerk](https://clerk.com/)** | Authentication & User Management |
+| **[dnd-kit](https://dndkit.com/)** | Flexible Drag-and-Drop Primitives |
+| **[Tailwind CSS](https://tailwindcss.com/)** | Utility-First Styling Framework |
+| **[TypeScript](https://www.typescriptlang.org/)** | Static Type Checking & Developer Tooling |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## <a name="features">🚀 Features</a>
+📋 Boards & Columns Create multiple boards and define custom columns.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+➕ Dynamic Tasks Add, edit and delete tasks with title, description, assignee, priority & due date.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+🔄 Drag & Drop Reorder tasks and move them between columns with smooth animations.
 
+📡 Real‑Time Updates Changes sync instantly across clients via Supabase subscriptions.
+
+🔍 Filtering Filter tasks by priority, due date, and search within a board.
+
+🔐 Auth & Billing Sign up / log in with Clerk
 {
 "code": "22P02",
 "details": null,
